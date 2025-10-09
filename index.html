@@ -246,6 +246,12 @@
         .message.user {
             justify-content: flex-end;
         }
+        
+        /* ユーザーメッセージにアバターがないため、右端に寄せるために調整 */
+        .message.user .message-bubble {
+            margin-right: 0;
+            margin-left: auto;
+        }
 
         .message.assistant {
             justify-content: flex-start;
@@ -481,8 +487,6 @@
     </div>
 
     <script>
-        // 画像はローカルに「chloe-profile2.jpg」「chloe-full2.jpg」「user-profile.jpg」が用意されている前提です。
-
         class CabaretChloe {
             constructor() {
                 this.userName = null;
@@ -503,7 +507,6 @@
                 };
             }
 
-            // --- 既存のメソッドは省略 (変更なし) ---
             analyzeDeepLove(text) {
                 let score = 0;
                 if (text.includes("愛") || text.includes("真剣") || text.includes("大切")) score += 8;
@@ -538,7 +541,6 @@
                 return false;
             }
             
-            // --- 画像クリック時の反応ロジックを強化 ---
             noticeFlirtation() {
                 this.intimacyAffinity = Math.min(100, this.intimacyAffinity + 3);
                 this.excitementTension = Math.min(100, this.excitementTension + 5);
@@ -546,9 +548,7 @@
                 const name = this.getCallingName();
                 let response = '';
                 
-                // 親密度と興奮度に基づいてセリフの多様性を出す
                 if (this.intimacyAffinity >= 80 && this.excitementTension >= 70) {
-                    // 究極の愛情モード (セクシーかつ独占欲強め)
                     const responses = [
                         `え、${name}、そんなじーっと見たら、くーたんが**独り占め**されちゃうよ？💕 あたしの全部、${name}だけのもの✨`,
                         `やだぁ〜、${name}に見つめられちゃった🙈 あたしの**秘密の姿**、見せてあげるね。もっと近くに来て？💋`,
@@ -556,7 +556,6 @@
                     ];
                     response = responses[Math.floor(Math.random() * responses.length)];
                 } else if (this.intimacyAffinity >= 50 && this.excitementTension >= 50) {
-                    // 遊び心のある親密モード (イチャイチャしつつもキャバ嬢らしい駆け引き)
                     const responses = [
                         `え、${name}、ちょーじーっと見てたでしょ？🤭 あたしのこと、そんなに好きなの？💕`,
                         `やだぁ〜、${name}に見つめられちゃった🙈 もっと見て、くーたんの全部見せちゃうよ？✨`,
@@ -564,7 +563,6 @@
                     ];
                     response = responses[Math.floor(Math.random() * responses.length)];
                 } else {
-                    // 初期・警戒モード (プロとして明るく、少しだけ意識させる)
                     const responses = [
                         `${name}、どうしたの？くーたんの顔に何かついてる？😅 もっと近くで見たいの？😉`,
                         `んも〜！${name}、目線が熱いよ？🔥 くーたん、**指名**待ってるね！`,
@@ -575,8 +573,6 @@
 
                 addMessage('assistant', response);
             }
-            // --- /画像クリック時の反応ロジックを強化 ---
-
 
             extractName(text) {
                 const patterns = [
@@ -705,29 +701,25 @@
             chloe.timeSpokenFlags.initialGreeting = true;
         }
 
-        // --- addMessage関数を修正し、アバター表示とクリックイベントを追加 ---
+        // --- addMessage関数を修正 (ユーザーアバターの生成部分を削除) ---
         function addMessage(role, content) {
             const messagesDiv = document.getElementById('messages');
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message ' + role;
             
-            const avatar = document.createElement('img');
-            avatar.className = 'message-avatar';
-            avatar.alt = (role === 'assistant' ? 'Chloe' : 'User');
-            
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+            bubble.textContent = content;
+
             if (role === 'assistant') {
+                const avatar = document.createElement('img');
+                avatar.className = 'message-avatar';
+                avatar.alt = 'Chloe';
                 avatar.src = 'chloe-profile2.jpg';
                 // くーたんのアバター画像にクリックイベントを追加
                 avatar.onclick = showFullImage; 
                 messageDiv.appendChild(avatar);
-            } else {
-                // ユーザーのアバター画像（仮のファイル名）
-                avatar.src = 'user-profile.jpg'; 
-            }
-            
-            const bubble = document.createElement('div');
-            bubble.className = 'message-bubble';
-            bubble.textContent = content;
+            } 
             
             if (role === 'assistant' && chloe.intimacyAffinity >= 50 && chloe.excitementTension >= 50) {
                 bubble.classList.add('flirty');
@@ -735,9 +727,8 @@
 
             messageDiv.appendChild(bubble);
             
-            if (role === 'user') {
-                messageDiv.appendChild(avatar);
-            }
+            // ユーザーメッセージの場合、アバターは追加しない
+            // if (role === 'user') { ... } のロジックを削除
 
             messagesDiv.appendChild(messageDiv);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
@@ -933,14 +924,10 @@
             }
         }
 
-        // --- 画像モーダル表示関数 ---
         function showFullImage() {
-            // クリックされたときに画像モーダルを表示
             document.getElementById('imageModal').classList.add('show');
-            // 画像を表示したことに反応し、親密度・興奮度に応じた多様なセリフを生成
             chloe.noticeFlirtation(); 
         }
-        // --- /画像モーダル表示関数 ---
 
         function hideFullImage() {
             document.getElementById('imageModal').classList.remove('show');
