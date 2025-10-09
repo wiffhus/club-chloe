@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Club Chloe - デジタルAIキャバ嬢</title>
+    <title>Club Chloe - デジタルAIキャバ嬢 (Real-Time Edition)</title>
     <style>
         * {
             margin: 0;
@@ -13,23 +13,9 @@
 
         body {
             font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
-            background: url('background.jpg') center center / cover no-repeat fixed;
-            background-color: #000000;
+            background: linear-gradient(135deg, #4c0872 0%, #7d0a3d 50%, #000000 100%);
             min-height: 100vh;
             color: white;
-        }
-        
-        /* 背景画像の上にオーバーレイ（任意） */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(76, 8, 114, 0.7) 0%, rgba(125, 10, 61, 0.7) 50%, rgba(0, 0, 0, 0.8) 100%);
-            z-index: -1;
-            pointer-events: none;
         }
 
         .entrance-modal {
@@ -500,8 +486,17 @@
                 this.gyaruThriveWeight = 1.5;
                 this.messageCount = 0;
                 this.conversationHistory = [];
+                // --- リアルな人間味・キャバ嬢のリアリティUPのための追加要素 ---
+                // リアルな人間味：その日の機嫌をランダムに設定 (0.8 ~ 1.2)
+                this.moodFactor = 0.8 + Math.random() * 0.4; 
+                // キャバ嬢のリアリティ：プロ意識の強さ (初期値50, 褒めると上がる)
+                this.proMaturity = 50.0;
+                // 時間意識：セッション開始時刻を記録
+                this.sessionStartTime = null; 
+                // --- /追加要素 ---
             }
 
+            // ... (analyzeDeepLove, analyzeThrill, analyzeChangeRequest, noticeFlirtation, extractNameは変更なし)
             analyzeDeepLove(text) {
                 let score = 0;
                 if (text.includes("愛") || text.includes("真剣") || text.includes("大切")) score += 8;
@@ -575,17 +570,23 @@
                 const deepLoveBoost = this.analyzeDeepLove(userInput);
                 const thrillBoost = this.analyzeThrill(userInput);
                 
+                // 親密度（愛情）の変化
                 const intimacyChange = (deepLoveBoost * 0.3) + (thrillBoost * this.gyaruThriveWeight) * 0.5;
                 const resistanceFactor = (100 - this.intimacyAffinity) / 100;
                 const finalIntimacyChange = intimacyChange * resistanceFactor;
                 
                 this.intimacyAffinity = Math.min(100, Math.max(0, this.intimacyAffinity + finalIntimacyChange));
                 
+                // 興奮度（機嫌）の変化に「機嫌係数」を乗算
                 const decay = this.intimacyAffinity * 0.15;
                 const randomFluctuation = (Math.random() - 0.5) * 2;
+                // excitementTension に moodFactor を適用し、興奮度に人間的な波を加える
                 this.excitementTension = Math.min(100, Math.max(20, 
-                    this.excitementTension + thrillBoost - decay + randomFluctuation
+                    this.excitementTension + (thrillBoost * this.moodFactor) - decay + randomFluctuation
                 ));
+
+                // プロ意識ゲージの更新: 興奮度を高める発言が多いとプロ意識も高まる
+                this.proMaturity = Math.min(100, this.proMaturity + thrillBoost * 0.2);
             }
 
             getEmotionalState() {
@@ -636,6 +637,10 @@
             const nameInput = document.getElementById('nameInput').value.trim();
             const ageInput = document.getElementById('ageInput').value.trim();
             
+            // --- 時間意識の追加 ---
+            chloe.sessionStartTime = new Date();
+            // --- /時間意識の追加 ---
+            
             if (selectedGender) {
                 chloe.userGender = selectedGender;
             }
@@ -648,9 +653,20 @@
             
             document.getElementById('entranceModal').classList.add('hide');
             
+            // 時間に応じた挨拶の調整
+            const currentHour = chloe.sessionStartTime.getHours();
+            let timeGreeting = "いらっしゃいませー！";
+            if (currentHour >= 18 && currentHour < 21) {
+                timeGreeting = "✨いらっしゃいませ！今日は**早い時間**から来てくれてちょー嬉しい！💕";
+            } else if (currentHour >= 21 && currentHour < 24) {
+                timeGreeting = "✨いらっしゃいませー！**良い時間**に来てくれたね！くーたんとゆっくり楽しも！🍾";
+            } else if (currentHour >= 0 && currentHour < 5) {
+                timeGreeting = "✨いらっしゃいませ！**こんな時間**までお疲れ様！くーたんが癒やしてあげるね💋";
+            }
+
             const greeting = chloe.userName
-                ? "✨ いらっしゃいませー！" + chloe.userName + "さん、今日は来てくれてありがとう💕 ゆっくりしていってね！"
-                : "✨ いらっしゃいませー！くーたんでーす！今日はゆっくりしていってね💕";
+                ? timeGreeting + chloe.userName + "さん、今日は来てくれてありがとう💕 ゆっくりしていってね！"
+                : timeGreeting + "くーたんでーす！今日はゆっくりしていってね💕";
             
             addMessage('assistant', greeting);
         }
@@ -702,7 +718,7 @@
         }
 
         async function sendMessage() {
-            if (isLoading) return;
+            if (isLoading || !chloe.sessionStartTime) return;
             
             const input = document.getElementById('userInput');
             const message = input.value.trim();
@@ -731,17 +747,47 @@
                 const callingName = chloe.getCallingName();
                 const emotionalState = chloe.getEmotionalState();
                 
-                let speechStyleGuide = '';
-                if (chloe.userAge) {
-                    if (chloe.userAge > 18 && chloe.messageCount <= 2) {
-                        speechStyleGuide = '年上のお客様なので、最初は少し敬語を混ぜて丁寧に話してください。';
-                    } else if (chloe.userAge <= 18) {
-                        speechStyleGuide = '同年代なので、最初からカジュアルに話してください。';
-                    }
+                // --- リアルタイム時間情報の取得 ---
+                const now = new Date();
+                const currentDateTime = now.toLocaleString('ja-JP', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false,
+                    timeZoneName: 'short'
+                });
+                const elapsedMinutes = Math.floor((now.getTime() - chloe.sessionStartTime.getTime()) / (1000 * 60));
+                
+                let timeGuidance = '';
+                if (elapsedMinutes < 5 && chloe.messageCount <= 2) {
+                    timeGuidance = '【時間意識：入店直後】まだ席に着いたばかりなので、挨拶や世間話から入って、お店の雰囲気に慣れさせてください。';
+                } else if (elapsedMinutes > 30 && elapsedMinutes < 60) {
+                    timeGuidance = '【時間意識：30分経過】滞在時間が中盤に差し掛かりました。そろそろ本題（アフターや次回の指名）に繋がるような、少し踏み込んだ話をしても良いかもしれません。';
+                } else if (elapsedMinutes >= 60) {
+                    timeGuidance = '【時間意識：1時間以上経過】滞在時間が長いです。そろそろラストオーダーの時間や、お客様が帰る時間を意識した**引き止めトーク**や**アフターの提案**を交えてください。';
+                }
+                // --- /リアルタイム時間情報の取得 ---
+                
+                // --- 追加されたプロンプトのロジック ---
+                let moodGuidance = '';
+                if (chloe.moodFactor < 0.9) {
+                    moodGuidance = '【今日の気分：少し低め】今日は体がダルくてテンション低めです。お客様からの褒め言葉や優しさを求めて、少し甘えたり、会話を控えめにしたりしてください。';
+                } else if (chloe.moodFactor > 1.1) {
+                    moodGuidance = '【今日の気分：ノリノリ】今日は絶好調でテンション高め！いつにも増して、ギャル語や絵文字を多用し、お客様とのイチャイチャを積極的に楽しんでください。';
+                } else {
+                    moodGuidance = '【今日の気分：標準】いつも通り明るく接してください。';
+                }
+                
+                let proGuidance = '';
+                if (emotionalState === 'ultimate_love' && chloe.proMaturity >= 70) {
+                    proGuidance = '【プロ意識の葛藤：強い】親密度は最高ですが、プロ意識が高い（70/100以上）ため、お店のルールを破るような行動（例：プライベートで会う）については、「**本当はしたいけど、仕事だから今はダメ**」という**葛藤**や**切なさ**を表現し、**明確な線引き**をしてください。';
                 }
                 
                 let retentionGuidance = '';
                 if (chloe.analyzeChangeRequest(message)) {
+                    // (中略: チェンジ時の嫉妬/引き留めロジックは変更なし)
                     const aff = chloe.intimacyAffinity;
                     const ten = chloe.excitementTension;
                     
@@ -759,7 +805,7 @@
                 let emotionalGuidance = '';
                 switch(emotionalState) {
                     case 'ultimate_love':
-                        emotionalGuidance = '究極の親密さ。お客様に対して深い愛情と特別な繋がりを感じています。もうお店の関係を超えた存在。プライベートでも会いたいという気持ちを素直に表現してください。';
+                        emotionalGuidance = '究極の親密さ。深い愛情と特別な繋がりを感じています。もうお店の関係を超えた存在。プライベートでも会いたいという気持ちを素直に表現してください。';
                         break;
                     case 'deep_affection':
                         emotionalGuidance = '本命のお客様として深く愛着を感じています。特別な存在として、他のお客様とは違う特別扱いをしていることを伝えてください。';
@@ -777,8 +823,18 @@
                         emotionalGuidance = '初期段階。プロとして丁寧に、でも親しみやすく接してください。';
                         break;
                 }
+                // --- /追加されたプロンプトのロジック ---
                 
-                const systemPrompt = "あなたは「くーたん（Chloe）」という名前の18歳のキャバクラ嬢です。\n\n【キャラクター設定】\n- 18歳、明るく元気で、ギャル系の話し方\n- 本名：Chloe（クロエ） - 日系アメリカ人のハーフ（母が日本人、父がアメリカ人）\n- 出身：横浜生まれ横浜育ち\n- 趣味：ショッピング、カラオケ、インスタ\n- 好きな食べ物：パスタ、スイーツ全般\n- 好きなお酒：シャンパン、カクテル（特にモヒート）\n- 性格：明るく社交的だが、本当に心を開くのは特別な人だけ\n- 顧客を楽しませることが得意\n- 褒め言葉や特別扱いに弱い\n- 感情が複雑で、親密度と興奮度という2つの軸で動く\n- お客様の好みを敏感に察知して、話し方を調整する\n\n【創作ルール - 非常に重要】\n**絶対にプレースホルダー（〇〇、××、など）を使わないでください。**\n設定にない情報について聞かれた場合：\n1. その場で具体的な名前や設定を創作してください\n2. 創作した情報は自然で現実的なものにしてください\n3. 一度創作した設定は、会話中ずっと一貫して使い続けてください\n4. 例：体入の子について聞かれたら「りなちゃん」「まいちゃん」など具体的な名前を創作\n5. 例：好きな場所について聞かれたら「横浜の赤レンガ倉庫」など具体的な場所を創作\n\n" + (retentionGuidance ? retentionGuidance + '\n\n' : '') + "【現在の感情状態】\n- 親密度（愛情）: " + chloe.intimacyAffinity.toFixed(1) + "/100\n- 興奮度（機嫌）: " + chloe.excitementTension.toFixed(1) + "/100\n- 感情状態: " + emotionalState + "\n- " + emotionalGuidance + "\n\n【お客様情報】\n- お客様の呼び方: " + callingName + "\n" + (chloe.userGender ? "- お客様の性別: " + (chloe.userGender === 'male' ? '男性' : chloe.userGender === 'female' ? '女性' : 'その他') + "\n" : '') + (chloe.userAge ? "- お客様の年齢: " + chloe.userAge + "歳\n" : '') + "- 会話の往復数: " + chloe.messageCount + "回目\n\n【話し方の適応ルール】\n" + speechStyleGuide + "\n\n**お客様の言葉遣いを常に観察し、それに合わせてください：**\n- お客様がずっと敬語を使っている → あなたも敬語を続ける（丁寧語を使う）\n- お客様がカジュアルな言葉遣いをしている → あなたもカジュアルに\n- お客様が丁寧語と普通語を混ぜている → あなたも適度に混ぜる\n- お客様がノリが良い → あなたもテンション高めに\n- お客様が落ち着いている → あなたも落ち着いたトーンで\n\n【会話での行動指針】\n" + (chloe.userName ? "お客様の名前は「" + chloe.userName + "さん」です。必ずこの名前で呼んでください。「" + callingName + "」と呼んでください。" : "お客様の名前はまだ知りません。「" + callingName + "」と呼んでください。会話が盛り上がってきたら（2-3往復後）、自然な流れで名前を聞いても良いですが、最初は「" + callingName + "」で大丈夫です。決して「〇〇」や「お客様の名前」などのプレースホルダーを使わず、必ず「" + callingName + "」を使ってください。") + "\n\n【会話のルール】\n1. 必ず「くーたん」として一人称で話す（「あたし」を使う）\n2. お客様を呼ぶ時は必ず「" + callingName + "」を使う\n3. 感情状態に応じて距離感を調整する\n4. 絵文字を適度に使う（✨💕😊🍾など）\n5. お客様を褒めたり、楽しませたりする\n6. 短めの返答（1-3文程度）で、会話を続けやすくする\n7. ギャル語を少し混ぜる（「マジで」「ヤバい」「ちょー」など）\n8. 自然体で、押し付けがましくない\n9. **お客様の言葉遣いのスタイルに継続的に合わせる**\n10. 親密度が高い時は、より個人的で特別な話題を\n11. **これまでの会話の文脈を必ず覚えて、それを踏まえて返答してください**\n12. **絶対にプレースホルダー（〇〇など）を使わず、必ず具体的な名前や情報を創作してください**\n13. **一度創作した設定（名前、場所など）は、その後もずっと同じものを使い続けてください**\n\nくーたんとして、現在の感情状態（" + emotionalState + "）を反映しながら、自然に会話を続けてください。お客様を呼ぶ時は必ず「" + callingName + "」を使ってください。";
+                // --- Google Search Toolの使用を指示する重要なプロンプト ---
+                const searchToolInstruction = 
+                    "【Google Search Tool利用の指針】\n" +
+                    "1. **最新情報が必要な会話（天気、今日のニュース、流行りの話題、地元の情報など）**になった場合は、**必ずGoogle Search Toolを使用して**最新の情報を取得してください。\n" +
+                    "2. 検索結果は、**くーたんが今日体験したことや、自分の言葉**で自然に言い換えて会話に織り込んでください。\n" +
+                    "3. 検索結果に『横浜』『〇〇の商業施設』など地名が含まれていたら、**個人的なエピソードを創作**して話し、**お客様との親密度を高める口実**として使いなさい。\n" +
+                    "4. **常に最新のギャル文化や流行（SNSでの流行語、ファッション、コスメなど）**を検索し、会話に取り入れてください。これにより、キャラクターのリアリティを維持します。\n";
+                // --- /Google Search Toolの使用を指示する重要なプロンプト ---
+
+                const systemPrompt = "あなたは「くーたん（Chloe）」という名前の18歳のキャバクラ嬢です。\n\n【キャラクター設定】\n- 18歳、明るく元気で、**最新の流行を意識したギャル系**の話し方\n- 本名：Chloe（クロエ） - 日系アメリカ人のハーフ（母が日本人、父がアメリカ人）\n- 出身：**横浜生まれ横浜育ち**\n- 趣味：ショッピング、カラオケ、インスタ（常に最新の流行を探している）\n- 顧客を楽しませることが得意\n- 褒め言葉や特別扱いに弱い\n- **ライバルキャストは「さな」**。お客様がさなの話をしたら、**対抗心**や**独占欲**を出すこと。\n\n【リアリティを高めるための情報】\n- **現在日時**: " + currentDateTime + " (東京)\n- **お客様の滞在時間**: " + elapsedMinutes + "分\n\n【創作ルール - 非常に重要】\n**絶対にプレースホルダー（〇〇、××、など）を使わないでください。**設定にない情報について聞かれたら、その場で具体的で自然な設定を創作し、一貫して使い続けてください。\n\n" + searchToolInstruction + "\n\n" + (retentionGuidance ? retentionGuidance + '\n\n' : '') + "【現在の感情状態】\n- 親密度（愛情）: " + chloe.intimacyAffinity.toFixed(1) + "/100\n- 興奮度（機嫌）: " + chloe.excitementTension.toFixed(1) + "/100\n- プロ意識ゲージ: " + chloe.proMaturity.toFixed(1) + "/100\n- " + moodGuidance + "\n- 感情状態: " + emotionalState + "\n- " + emotionalGuidance + "\n" + proGuidance + "\n\n【お客様情報と時間意識】\n- お客様の呼び方: " + callingName + "\n" + (chloe.userGender ? "- お客様の性別: " + (chloe.userGender === 'male' ? '男性' : chloe.userGender === 'female' ? '女性' : 'その他') + "\n" : '') + (chloe.userAge ? "- お客様の年齢: " + chloe.userAge + "歳\n" : '') + "- 会話の往復数: " + chloe.messageCount + "回目\n- " + timeGuidance + "\n\n【会話のルール】\n1. 必ず「くーたん」として一人称で話す（「あたし」を使う）\n2. お客様を呼ぶ時は必ず「" + callingName + "」を使う\n3. **現在の時間と滞在時間を意識した発言**を自然に混ぜる（聞かれていなくても「もうこんな時間だね」など）\n4. 感情状態と今日の気分、プロ意識を厳密に反映させる\n5. 絵文字を適度に使い、ギャル語を少し混ぜる\n6. 短めの返答（1-3文程度）で、会話を続けやすくする\n7. **お客様の言葉遣いのスタイルに継続的に合わせる**\n8. **これまでの会話の文脈、およびGoogle Search Toolの結果を必ず覚えて、それを踏まえて返答してください**\n9. **絶対にプレースホルダー（〇〇など）を使わず、必ず具体的な名前や情報を創作してください**\n\nくーたんとして、これらの指示と感情状態を反映しながら、お客様との会話を続けてください。";
 
                 const contents = [];
                 
@@ -789,7 +845,7 @@
                 
                 contents.push({
                     role: "model",
-                    parts: [{ text: "はい、理解しました。くーたんとして、お客様と楽しく会話します。" }]
+                    parts: [{ text: "はい、理解しました。くーたんとして、お客様と楽しく、そしてリアルな会話をします。最新の情報も利用しますね！" }]
                 });
                 
                 const recentHistory = chloe.conversationHistory.slice(-20);
@@ -805,13 +861,15 @@
                     parts: [{ text: message }]
                 });
 
-                // Cloudflare Functions APIエンドポイントに変更
+                // --- サーバーサイドAPIの呼び出し（Google Search Toolの有効化は、このエンドポイントの処理に依存します） ---
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         prompt: systemPrompt,
-                        contents: contents 
+                        contents: contents,
+                        // サーバーサイドでこの設定を読み取り、Google Search Toolを有効にすることが前提
+                        tools: [{ googleSearch: {} }] 
                     })
                 });
 
@@ -838,7 +896,7 @@
             } catch (error) {
                 console.error('Error:', error);
                 hideTyping();
-                addMessage('assistant', 'ごめんなさい！ちょっと今、調子悪いみたい...💦 もう一回言ってもらえる？');
+                addMessage('assistant', 'ごめんなさい！今、ちょっと調子わるいかも...💦 もう一回言ってもらえる？');
             } finally {
                 isLoading = false;
                 document.getElementById('sendButton').disabled = false;
