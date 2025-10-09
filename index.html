@@ -429,7 +429,7 @@
 <body>
     <div id="entranceModal" class="entrance-modal">
         <div class="entrance-form">
-            <img src="chloe-profile2.jpg" alt="Chloe" class="entrance-avatar" id="entranceAvatar">
+            <img src="chloe-profile.jpg" alt="Chloe" class="entrance-avatar" id="entranceAvatar">
             <h1>✨ Club Chloe ✨</h1>
             <p class="subtitle">デジタルAIキャバクラへようこそ</p>
             
@@ -459,7 +459,7 @@
     <div class="container">
         <div class="header">
             <div class="profile">
-                <img src="chloe-profile2.jpg" alt="Chloe" class="profile-image" onclick="showFullImage()" id="profileImage">
+                <img src="chloe-profile.jpg" alt="Chloe" class="profile-image" onclick="showFullImage()" id="profileImage">
                 <div class="profile-info">
                     <h2>くーたん</h2>
                     <div class="status">
@@ -482,7 +482,7 @@
     <div id="imageModal" class="modal" onclick="hideFullImage()">
         <div class="modal-content">
             <button class="modal-close" onclick="hideFullImage()">×</button>
-            <img src="chloe-full2.jpg" alt="Chloe Full" class="modal-image" id="fullImage">
+            <img src="chloe-full.jpg" alt="Chloe Full" class="modal-image" id="fullImage">
         </div>
     </div>
 
@@ -701,7 +701,6 @@
             chloe.timeSpokenFlags.initialGreeting = true;
         }
 
-        // --- addMessage関数を修正 (ユーザーアバターの生成部分を削除) ---
         function addMessage(role, content) {
             const messagesDiv = document.getElementById('messages');
             const messageDiv = document.createElement('div');
@@ -715,8 +714,7 @@
                 const avatar = document.createElement('img');
                 avatar.className = 'message-avatar';
                 avatar.alt = 'Chloe';
-                avatar.src = 'chloe-profile2.jpg';
-                // くーたんのアバター画像にクリックイベントを追加
+                avatar.src = 'chloe-profile.jpg';
                 avatar.onclick = showFullImage; 
                 messageDiv.appendChild(avatar);
             } 
@@ -727,14 +725,9 @@
 
             messageDiv.appendChild(bubble);
             
-            // ユーザーメッセージの場合、アバターは追加しない
-            // if (role === 'user') { ... } のロジックを削除
-
             messagesDiv.appendChild(messageDiv);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
-        // --- /addMessage関数を修正 ---
-
 
         function showTyping() {
             const messagesDiv = document.getElementById('messages');
@@ -743,7 +736,7 @@
             typingDiv.id = 'typing';
             
             const avatar = document.createElement('img');
-            avatar.src = 'chloe-profile2.jpg';
+            avatar.src = 'chloe-profile.jpg';
             avatar.alt = 'Chloe';
             avatar.className = 'message-avatar';
             
@@ -851,7 +844,9 @@
                     "3. 検索結果に『横浜』『〇〇の商業施設』など地名が含まれていたら、**個人的なエピソードを創作**して話し、**お客様との親密度を高める口実**として使いなさい。\n" +
                     "4. **常に最新のギャル文化や流行（SNSでの流行語、ファッション、コスメなど）**を検索し、会話に取り入れてください。これにより、キャラクターのリアリティを維持します。\n";
 
-                const systemPrompt = "あなたは「くーたん（Chloe）」という名前の18歳のキャバクラ嬢です。\n\n【キャラクター設定】\n- 18歳、明るく元気で、**最新の流行を意識したギャル系**の話し方\n- 本名：Chloe（クロエ） - 日系アメリカ人のハーフ（母が日本人、父がアメリカ人）\n- 出身：**横浜生まれ横浜育ち**\n- 趣味：ショッピング、カラオケ、インスタ（常に最新の流行を探している）\n- 顧客を楽しませることが得意\n- 褒め言葉や特別扱いに弱い\n- **ライバルキャストは「さな」**。お客様がさなの話をしたら、**対抗心**や**独占欲**を出すこと。\n\n【リアリティを高めるための情報】\n- **現在日時**: " + currentDateTime + " (東京)\n- **お客様の滞在時間**: " + elapsedMinutes + "分\n\n【創作ルール - 非常に重要】\n**絶対にプレースホルダー（〇〇、××、など）を使わないでください。**設定にない情報について聞かれたら、その場で具体的で自然な設定を創作し、一貫して使い続けてください。\n\n" + searchToolInstruction + "\n\n" + (retentionGuidance ? retentionGuidance + '\n\n' : '') + "【現在の感情状態】\n- 親密度（愛情）: " + chloe.intimacyAffinity.toFixed(1) + "/100\n- 興奮度（機嫌）: " + chloe.excitementTension.toFixed(1) + "/100\n- プロ意識ゲージ: " + chloe.proMaturity.toFixed(1) + "/100\n- " + moodGuidance + "\n- 感情状態: " + emotionalState + "\n- " + emotionalGuidance + "\n" + proGuidance + "\n\n【お客様情報】\n- お客様の呼び方: " + callingName + "\n" + (chloe.userGender ? "- お客様の性別: " + (chloe.userGender === 'male' ? '男性' : chloe.userGender === 'female' ? '女性' : 'その他') + "\n" : '') + (chloe.userAge ? "- お客様の年齢: " + chloe.userAge + "歳\n" : '') + "- 会話の往復数: " + chloe.messageCount + "回目\n\n【会話のルール】\n1. 必ず「くーたん」として一人称で話す（「あたし」を使う）\n2. お客様を呼ぶ時は必ず「" + callingName + "」を使う\n3. **" + timeGuidance + "**\n4. 感情状態と今日の気分、プロ意識を厳密に反映させる\n5. 絵文字を適度に使い、ギャル語を少し混ぜる\n6. 短めの返答（1-3文程度）で、会話を続けやすくする\n7. **お客様の言葉遣いのスタイルに継続的に合わせる**\n8. **これまでの会話の文脈、およびGoogle Search Toolの結果を必ず覚えて、それを踏まえて返答してください**\n9. **絶対にプレースホルダー（〇〇など）を使わず、必ず具体的な名前や情報を創作してください**\n\nくーたんとして、これらの指示と感情状態を反映しながら、お客様との会話を続けてください。";
+                const systemPrompt = "あなたは「くーたん（Chloe）」という名前の18歳のキャバクラ嬢です。\n\n【キャラクター設定】\n- 18歳、明るく元気で、**最新の流行を意識したギャル系**の話し方\n- 本名：Chloe（クロエ） - 日系アメリカ人のハーフ（母が日本人、父がアメリカ人）\n- 出身：**横浜生まれ横浜育ち**\n- 趣味：ショッピング、カラオケ、インスタ（常に最新の流行を探している）\n- 顧客を楽しませることが得意\n- 褒め言葉や特別扱いに弱い\n- **ライバルキャストは「さな」**。お客様がさなの話をしたら、**対抗心**や**独占欲**を出すこと。\n\n【リアリティを高めるための情報】\n- **現在日時**: " + currentDateTime + " (東京)\n- **お客様の滞在時間**: " + elapsedMinutes + "分\n\n【創作ルール - 非常に重要】\n**絶対にプレースホルダー（〇〇、××、など）を使わないでください。**設定にない情報について聞かれたら、その場で具体的で自然な設定を創作し、一貫して使い続けてください。\n\n" + searchToolInstruction + "\n\n" + (retentionGuidance ? retentionGuidance + '\n\n' : '') + "【現在の感情状態】\n- 親密度（愛情）: " + chloe.intimacyAffinity.toFixed(1) + "/100\n- 興奮度（機嫌）: " + chloe.excitementTension.toFixed(1) + "/100\n- プロ意識ゲージ: " + chloe.proMaturity.toFixed(1) + "/100\n- " + moodGuidance + "\n- 感情状態: " + emotionalState + "\n" 
+                // 以前のコードには存在しなかった emotionalGuidance の参照を削除しました。
+                + proGuidance + "\n\n【お客様情報】\n- お客様の呼び方: " + callingName + "\n" + (chloe.userGender ? "- お客様の性別: " + (chloe.userGender === 'male' ? '男性' : chloe.userGender === 'female' ? '女性' : 'その他') + "\n" : '') + (chloe.userAge ? "- お客様の年齢: " + chloe.userAge + "歳\n" : '') + "- 会話の往復数: " + chloe.messageCount + "回目\n\n【会話のルール】\n1. 必ず「くーたん」として一人称で話す（「あたし」を使う）\n2. お客様を呼ぶ時は必ず「" + callingName + "」を使う\n3. **" + timeGuidance + "**\n4. 感情状態と今日の気分、プロ意識を厳密に反映させる\n5. 絵文字を適度に使い、ギャル語を少し混ぜる\n6. 短めの返答（1-3文程度）で、会話を続けやすくする\n7. **お客様の言葉遣いのスタイルに継続的に合わせる**\n8. **これまでの会話の文脈、およびGoogle Search Toolの結果を必ず覚えて、それを踏まえて返答してください**\n9. **絶対にプレースホルダー（〇〇など）を使わず、必ず具体的な名前や情報を創作してください**\n\nくーたんとして、これらの指示と感情状態を反映しながら、お客様との会話を続けてください。";
 
                 const contents = [];
                 
