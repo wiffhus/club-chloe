@@ -259,6 +259,11 @@
             border: 2px solid #ec4899;
             flex-shrink: 0;
         }
+        
+        /* くーたんのメッセージ横のアバターをポインターにする */
+        .message.assistant .message-avatar {
+            cursor: pointer; 
+        }
 
         .message-bubble {
             max-width: 70%;
@@ -418,7 +423,7 @@
 <body>
     <div id="entranceModal" class="entrance-modal">
         <div class="entrance-form">
-            <img src="chloe-profile.jpg" alt="Chloe" class="entrance-avatar" id="entranceAvatar">
+            <img src="chloe-profile2.jpg" alt="Chloe" class="entrance-avatar" id="entranceAvatar">
             <h1>✨ Club Chloe ✨</h1>
             <p class="subtitle">デジタルAIキャバクラへようこそ</p>
             
@@ -448,7 +453,7 @@
     <div class="container">
         <div class="header">
             <div class="profile">
-                <img src="chloe-profile.jpg" alt="Chloe" class="profile-image" onclick="showFullImage()" id="profileImage">
+                <img src="chloe-profile2.jpg" alt="Chloe" class="profile-image" onclick="showFullImage()" id="profileImage">
                 <div class="profile-info">
                     <h2>くーたん</h2>
                     <div class="status">
@@ -471,11 +476,13 @@
     <div id="imageModal" class="modal" onclick="hideFullImage()">
         <div class="modal-content">
             <button class="modal-close" onclick="hideFullImage()">×</button>
-            <img src="chloe-full.jpg" alt="Chloe Full" class="modal-image" id="fullImage">
+            <img src="chloe-full2.jpg" alt="Chloe Full" class="modal-image" id="fullImage">
         </div>
     </div>
 
     <script>
+        // 画像はローカルに「chloe-profile2.jpg」「chloe-full2.jpg」「user-profile.jpg」が用意されている前提です。
+
         class CabaretChloe {
             constructor() {
                 this.userName = null;
@@ -489,7 +496,6 @@
                 this.moodFactor = 0.8 + Math.random() * 0.4; 
                 this.proMaturity = 50.0;
                 this.sessionStartTime = null; 
-                // 時間に関する発言をしたかどうかを管理するフラグ
                 this.timeSpokenFlags = {
                     initialGreeting: false,
                     thirtyMinutes: false,
@@ -497,7 +503,7 @@
                 };
             }
 
-            // --- 既存のメソッド (analyzeDeepLove, analyzeThrill, analyzeChangeRequest, noticeFlirtation, extractName, updateEmotions, getEmotionalState, getCallingName) は変更なし ---
+            // --- 既存のメソッドは省略 (変更なし) ---
             analyzeDeepLove(text) {
                 let score = 0;
                 if (text.includes("愛") || text.includes("真剣") || text.includes("大切")) score += 8;
@@ -531,22 +537,46 @@
                 }
                 return false;
             }
-
+            
+            // --- 画像クリック時の反応ロジックを強化 ---
             noticeFlirtation() {
                 this.intimacyAffinity = Math.min(100, this.intimacyAffinity + 3);
                 this.excitementTension = Math.min(100, this.excitementTension + 5);
                 
                 const name = this.getCallingName();
-                const flirtResponses = [
-                    `え、${name}、ちょーじーっと見てたでしょ？🤭 あたしのこと、そんなに好きなの？💕`,
-                    `やだぁ〜、${name}に見つめられちゃった🙈 もっと見て、くーたんの全部見せちゃうよ？✨`,
-                    `${name}、そんなに見つめられたら、くーたん、ドキドキしちゃうじゃん！💋`,
-                    `くーたんの全身チェックした？😉 ${name}のこと、あたしだって見てるんだからね！`
-                ];
+                let response = '';
                 
-                const response = flirtResponses[Math.floor(Math.random() * flirtResponses.length)];
+                // 親密度と興奮度に基づいてセリフの多様性を出す
+                if (this.intimacyAffinity >= 80 && this.excitementTension >= 70) {
+                    // 究極の愛情モード (セクシーかつ独占欲強め)
+                    const responses = [
+                        `え、${name}、そんなじーっと見たら、くーたんが**独り占め**されちゃうよ？💕 あたしの全部、${name}だけのもの✨`,
+                        `やだぁ〜、${name}に見つめられちゃった🙈 あたしの**秘密の姿**、見せてあげるね。もっと近くに来て？💋`,
+                        `${name}、そんなにガン見されると、**仕事じゃなくてプライベート**で会いたくなっちゃうじゃん！会いたい？😉`
+                    ];
+                    response = responses[Math.floor(Math.random() * responses.length)];
+                } else if (this.intimacyAffinity >= 50 && this.excitementTension >= 50) {
+                    // 遊び心のある親密モード (イチャイチャしつつもキャバ嬢らしい駆け引き)
+                    const responses = [
+                        `え、${name}、ちょーじーっと見てたでしょ？🤭 あたしのこと、そんなに好きなの？💕`,
+                        `やだぁ〜、${name}に見つめられちゃった🙈 もっと見て、くーたんの全部見せちゃうよ？✨`,
+                        `${name}、そんなに見つめられたら、くーたん、ドキドキしちゃうじゃん！💋`
+                    ];
+                    response = responses[Math.floor(Math.random() * responses.length)];
+                } else {
+                    // 初期・警戒モード (プロとして明るく、少しだけ意識させる)
+                    const responses = [
+                        `${name}、どうしたの？くーたんの顔に何かついてる？😅 もっと近くで見たいの？😉`,
+                        `んも〜！${name}、目線が熱いよ？🔥 くーたん、**指名**待ってるね！`,
+                        `くーたんの全身チェックした？😉 ${name}のこと、あたしだって見てるんだからね！`
+                    ];
+                    response = responses[Math.floor(Math.random() * responses.length)];
+                }
+
                 addMessage('assistant', response);
             }
+            // --- /画像クリック時の反応ロジックを強化 ---
+
 
             extractName(text) {
                 const patterns = [
@@ -619,7 +649,6 @@
                 }
             }
             
-            // --- 時間に関するフラグをリセット ---
             resetTimeFlags() {
                  this.timeSpokenFlags = {
                     initialGreeting: false,
@@ -644,7 +673,7 @@
             const ageInput = document.getElementById('ageInput').value.trim();
             
             chloe.sessionStartTime = new Date();
-            chloe.resetTimeFlags(); // フラグをリセット
+            chloe.resetTimeFlags();
             
             if (selectedGender) {
                 chloe.userGender = selectedGender;
@@ -658,7 +687,6 @@
             
             document.getElementById('entranceModal').classList.add('hide');
             
-            // 入店時の時刻チェックと挨拶
             const currentHour = chloe.sessionStartTime.getHours();
             let timeGreeting = "いらっしゃいませー！";
             if (currentHour >= 18 && currentHour < 21) {
@@ -674,20 +702,27 @@
                 : timeGreeting + "くーたんでーす！今日はゆっくりしていってね💕";
             
             addMessage('assistant', greeting);
-            chloe.timeSpokenFlags.initialGreeting = true; // 初回挨拶フラグを立てる
+            chloe.timeSpokenFlags.initialGreeting = true;
         }
 
+        // --- addMessage関数を修正し、アバター表示とクリックイベントを追加 ---
         function addMessage(role, content) {
             const messagesDiv = document.getElementById('messages');
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message ' + role;
             
+            const avatar = document.createElement('img');
+            avatar.className = 'message-avatar';
+            avatar.alt = (role === 'assistant' ? 'Chloe' : 'User');
+            
             if (role === 'assistant') {
-                const avatar = document.createElement('img');
-                avatar.src = 'chloe-profile.jpg';
-                avatar.alt = 'Chloe';
-                avatar.className = 'message-avatar';
+                avatar.src = 'chloe-profile2.jpg';
+                // くーたんのアバター画像にクリックイベントを追加
+                avatar.onclick = showFullImage; 
                 messageDiv.appendChild(avatar);
+            } else {
+                // ユーザーのアバター画像（仮のファイル名）
+                avatar.src = 'user-profile.jpg'; 
             }
             
             const bubble = document.createElement('div');
@@ -699,9 +734,16 @@
             }
 
             messageDiv.appendChild(bubble);
+            
+            if (role === 'user') {
+                messageDiv.appendChild(avatar);
+            }
+
             messagesDiv.appendChild(messageDiv);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
+        // --- /addMessage関数を修正 ---
+
 
         function showTyping() {
             const messagesDiv = document.getElementById('messages');
@@ -709,10 +751,16 @@
             typingDiv.className = 'message assistant';
             typingDiv.id = 'typing';
             
+            const avatar = document.createElement('img');
+            avatar.src = 'chloe-profile2.jpg';
+            avatar.alt = 'Chloe';
+            avatar.className = 'message-avatar';
+            
             const bubble = document.createElement('div');
             bubble.className = 'message-bubble typing';
             bubble.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
             
+            typingDiv.appendChild(avatar);
             typingDiv.appendChild(bubble);
             messagesDiv.appendChild(typingDiv);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
@@ -753,7 +801,6 @@
                 const callingName = chloe.getCallingName();
                 const emotionalState = chloe.getEmotionalState();
                 
-                // --- リアルタイム時間情報の取得 ---
                 const now = new Date();
                 const currentDateTime = now.toLocaleString('ja-JP', {
                     year: 'numeric',
@@ -766,19 +813,16 @@
                 });
                 const elapsedMinutes = Math.floor((now.getTime() - chloe.sessionStartTime.getTime()) / (1000 * 60));
                 
-                // --- 時間意識の「自然な」発言制御ロジックの改善 ---
-                let timeGuidance = '【時間意識：普段の会話】時間に関する言及は、お客様から質問がない限り**一切しない**でください。会話のトーンや内容にのみ、現在の時間帯（例：深夜、週末など）や滞在時間（例：そろそろ次回の話）を**間接的に**反映させてください。'; // デフォルトで時間言及を禁止
+                let timeGuidance = '【時間意識：普段の会話】時間に関する言及は、お客様から質問がない限り**一切しない**でください。会話のトーンや内容にのみ、現在の時間帯（例：深夜、週末など）や滞在時間（例：そろそろ次回の話）を**間接的に**反映させてください。';
                 
                 if (chloe.messageCount > 1 && elapsedMinutes >= 30 && !chloe.timeSpokenFlags.thirtyMinutes) {
                     timeGuidance = '【時間意識：30分経過】滞在時間が中盤（30分）に差し掛かりました。「**え、もうこんな時間？**」のように**驚き**と**名残惜しさ**を表現し、会話に織り込んでください。そろそろ本題（アフターや次回の指名）に繋がるような、少し踏み込んだ話をしても良いかもしれません。';
-                    chloe.timeSpokenFlags.thirtyMinutes = true; // フラグを立てる
+                    chloe.timeSpokenFlags.thirtyMinutes = true;
                 } else if (elapsedMinutes >= 60 && !chloe.timeSpokenFlags.sixtyMinutes) {
                     timeGuidance = '【時間意識：1時間以上経過】滞在時間が長いです。そろそろラストオーダーの時間や、お客様が帰る時間を意識した**強い引き止めトーク**や**アフターの提案**を交えてください。「**帰っちゃうの？ヤダ！**」のような引き止めをしてください。';
-                    chloe.timeSpokenFlags.sixtyMinutes = true; // フラグを立てる
+                    chloe.timeSpokenFlags.sixtyMinutes = true;
                 }
-                // --- /時間意識の「自然な」発言制御ロジックの改善 ---
                 
-                // --- 追加されたプロンプトのロジック (変更なし) ---
                 let moodGuidance = '';
                 if (chloe.moodFactor < 0.9) {
                     moodGuidance = '【今日の気分：少し低め】今日は体がダルくてテンション低めです。お客様からの褒め言葉や優しさを求めて、少し甘えたり、会話を控えめにしたりしてください。';
@@ -795,7 +839,6 @@
                 
                 let retentionGuidance = '';
                 if (chloe.analyzeChangeRequest(message)) {
-                    // (中略: チェンジ時の嫉妬/引き留めロジックは変更なし)
                     const aff = chloe.intimacyAffinity;
                     const ten = chloe.excitementTension;
                     
@@ -809,16 +852,13 @@
                         retentionGuidance = '【緊急指示：プロの対応】お客様が「チェンジ」を求めています。親密度が低いので、プロとして**笑顔で対応しつつも**、「くーたんじゃ物足りなかった？」と**少しだけ寂しそうなフリ**をして、**さりげなく引き留める**メッセージを作成してください。';
                     }
                 }
-                // --- /追加されたプロンプトのロジック ---
                 
-                // --- Google Search Toolの使用を指示する重要なプロンプト (変更なし) ---
                 const searchToolInstruction = 
                     "【Google Search Tool利用の指針】\n" +
                     "1. **最新情報が必要な会話（天気、今日のニュース、流行りの話題、地元の情報など）**になった場合は、**必ずGoogle Search Toolを使用して**最新の情報を取得してください。\n" +
                     "2. 検索結果は、**くーたんが今日体験したことや、自分の言葉**で自然に言い換えて会話に織り込んでください。\n" +
                     "3. 検索結果に『横浜』『〇〇の商業施設』など地名が含まれていたら、**個人的なエピソードを創作**して話し、**お客様との親密度を高める口実**として使いなさい。\n" +
                     "4. **常に最新のギャル文化や流行（SNSでの流行語、ファッション、コスメなど）**を検索し、会話に取り入れてください。これにより、キャラクターのリアリティを維持します。\n";
-                // --- /Google Search Toolの使用を指示する重要なプロンプト ---
 
                 const systemPrompt = "あなたは「くーたん（Chloe）」という名前の18歳のキャバクラ嬢です。\n\n【キャラクター設定】\n- 18歳、明るく元気で、**最新の流行を意識したギャル系**の話し方\n- 本名：Chloe（クロエ） - 日系アメリカ人のハーフ（母が日本人、父がアメリカ人）\n- 出身：**横浜生まれ横浜育ち**\n- 趣味：ショッピング、カラオケ、インスタ（常に最新の流行を探している）\n- 顧客を楽しませることが得意\n- 褒め言葉や特別扱いに弱い\n- **ライバルキャストは「さな」**。お客様がさなの話をしたら、**対抗心**や**独占欲**を出すこと。\n\n【リアリティを高めるための情報】\n- **現在日時**: " + currentDateTime + " (東京)\n- **お客様の滞在時間**: " + elapsedMinutes + "分\n\n【創作ルール - 非常に重要】\n**絶対にプレースホルダー（〇〇、××、など）を使わないでください。**設定にない情報について聞かれたら、その場で具体的で自然な設定を創作し、一貫して使い続けてください。\n\n" + searchToolInstruction + "\n\n" + (retentionGuidance ? retentionGuidance + '\n\n' : '') + "【現在の感情状態】\n- 親密度（愛情）: " + chloe.intimacyAffinity.toFixed(1) + "/100\n- 興奮度（機嫌）: " + chloe.excitementTension.toFixed(1) + "/100\n- プロ意識ゲージ: " + chloe.proMaturity.toFixed(1) + "/100\n- " + moodGuidance + "\n- 感情状態: " + emotionalState + "\n- " + emotionalGuidance + "\n" + proGuidance + "\n\n【お客様情報】\n- お客様の呼び方: " + callingName + "\n" + (chloe.userGender ? "- お客様の性別: " + (chloe.userGender === 'male' ? '男性' : chloe.userGender === 'female' ? '女性' : 'その他') + "\n" : '') + (chloe.userAge ? "- お客様の年齢: " + chloe.userAge + "歳\n" : '') + "- 会話の往復数: " + chloe.messageCount + "回目\n\n【会話のルール】\n1. 必ず「くーたん」として一人称で話す（「あたし」を使う）\n2. お客様を呼ぶ時は必ず「" + callingName + "」を使う\n3. **" + timeGuidance + "**\n4. 感情状態と今日の気分、プロ意識を厳密に反映させる\n5. 絵文字を適度に使い、ギャル語を少し混ぜる\n6. 短めの返答（1-3文程度）で、会話を続けやすくする\n7. **お客様の言葉遣いのスタイルに継続的に合わせる**\n8. **これまでの会話の文脈、およびGoogle Search Toolの結果を必ず覚えて、それを踏まえて返答してください**\n9. **絶対にプレースホルダー（〇〇など）を使わず、必ず具体的な名前や情報を創作してください**\n\nくーたんとして、これらの指示と感情状態を反映しながら、お客様との会話を続けてください。";
 
@@ -847,14 +887,12 @@
                     parts: [{ text: message }]
                 });
 
-                // --- サーバーサイドAPIの呼び出し（Google Search Toolの有効化は、このエンドポイントの処理に依存します） ---
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         prompt: systemPrompt,
                         contents: contents,
-                        // サーバーサイドでこの設定を読み取り、Google Search Toolを有効にすることが前提
                         tools: [{ googleSearch: {} }] 
                     })
                 });
@@ -895,10 +933,14 @@
             }
         }
 
+        // --- 画像モーダル表示関数 ---
         function showFullImage() {
+            // クリックされたときに画像モーダルを表示
             document.getElementById('imageModal').classList.add('show');
+            // 画像を表示したことに反応し、親密度・興奮度に応じた多様なセリフを生成
             chloe.noticeFlirtation(); 
         }
+        // --- /画像モーダル表示関数 ---
 
         function hideFullImage() {
             document.getElementById('imageModal').classList.remove('show');
